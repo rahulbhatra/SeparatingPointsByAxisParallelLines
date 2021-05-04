@@ -17,14 +17,7 @@ from CheckFeasiblity import *
 
 def separating_points_by_axis_parallel_lines(number_of_coordinates: int, coordinates: []):
     coordinates = sorted(coordinates)
-    # coordinates = sorted(coordinates, key=itemgetter(1))
-    # coordinates = sorted(coordinates, key=itemgetter(0))
-    vertical_lines, horizontal_lines = arbitrary_feasible_solution(number_of_coordinates, coordinates)
-    # print(coordinates)
-    is_feasible = is_solution_feasible(number_of_coordinates, coordinates, vertical_lines, horizontal_lines)
-    print(is_feasible)
-    vertical_lines, horizontal_lines = simulated_annealing(number_of_coordinates, coordinates, vertical_lines,
-                                                           horizontal_lines)
+    vertical_lines, horizontal_lines = simulated_annealing(number_of_coordinates, coordinates)
     return vertical_lines, horizontal_lines
 
 
@@ -70,108 +63,26 @@ def arbitrary_feasible_solution(number_of_coordinates: int, coordinates: []):
 
 
 """
-    Solution will be feasible if every two points are separated by a line in the solution space.
-    So if every pair of two points are separated by a axis parallel line in between them then
-    the solution is feasible.
-    
-    Here we have n = number of coordinates
-    At most there can be n - 1 number of vertical lines or n - 1 horizontal lines to separate every
-    point with each other.
-    
-    So Nested loop time complexity will be O(n^3) as most outer loop will run for n times, second outer
-    loop will also run for n times and most inner loop also run for max n - 1 times.
-    
-    All other operations in loop and outside will be constant time. So total time complexity of checking
-    solution feasibility will be O(n^3).
-"""
-
-
-def is_solution_feasible(number_of_coordinates: int, coordinates: [], vertical_lines: [], horizontal_lines: []):
-    # is_feasible = True
-    # for i in range(0, number_of_coordinates):
-    #     for j in range(i + 1, number_of_coordinates):
-    #         vertical_separation = False
-    #         for vertical_line in vertical_lines:
-    #             if coordinates[i][0] < vertical_line < coordinates[j][0]:
-    #                 vertical_separation = True
-    #                 break
-    #
-    #         horizontal_separation = False
-    #         for horizontal_line in horizontal_lines:
-    #             if coordinates[i][1] < horizontal_line < coordinates[j][1]:
-    #                 horizontal_separation = True
-    #                 break
-    #
-    #         # No separation found between two pair of coordinates so solution is not feasible
-    #         if vertical_separation is False and horizontal_separation is False:
-    #             is_feasible = False
-    #             return is_feasible
-    #
-    # # Every pair found a separation between so it is a feasible solution
-    # return is_feasible
-
-    # first = check_is_feasible(number_of_coordinates, coordinates, vertical_lines, horizontal_lines)
-    second = check_feasibility(number_of_coordinates, coordinates, vertical_lines, horizontal_lines)
-
-    # if first != second:
-    #     print(first, second)
-    #     print(vertical_lines, horizontal_lines)
-    return second
-
-
-def check_is_feasible(number_of_coordinates: int, coordinates: [], vertical_lines: [], horizontal_lines: []):
-
-    # print(coordinates)
-    is_feasible = True
-    for i in range(0, number_of_coordinates - 1):
-        for j in range(i + 1, number_of_coordinates):
-            vertical_separation = False
-            for vertical_line in vertical_lines:
-                if coordinates[i][0] < vertical_line < coordinates[j][0]:
-                    vertical_separation = True
-                    break
-
-            horizontal_separation = False
-            for horizontal_line in horizontal_lines:
-                if coordinates[i][1] < coordinates[j][1] and coordinates[i][1] < horizontal_line < coordinates[j][1]:
-                    horizontal_separation = True
-                    break
-
-                if coordinates[j][1] < coordinates[i][1] and coordinates[j][1] < horizontal_line < coordinates[i][1]:
-                    horizontal_separation = True
-                    break
-
-            # No separation found between two pair of coordinates so solution is not feasible
-            if vertical_separation is False and horizontal_separation is False:
-                is_feasible = False
-                return is_feasible
-
-    # Every pair found a separation between so it is a feasible solution
-    return is_feasible
-
-
-"""
     Here we first got arbitrary feasible solution and have vertical and horizontal lines out of that.
     Then we are removing two lines on pair (vertical, vertical), (vertical, horizontal), (horizontal,
-    horizontal) and adding third line can ve vertical or horizontal and checking solution feasibility.
-    If solution is feasible then we are adding solution to the solution space as done in stimulated 
-    annealing.
+    horizontal) and adding third line. Third Line can ve vertical or horizontal and checking solution 
+    feasibility. If solution is feasible then we are adding solution to the solution space as done in 
+    stimulated annealing.
     
-    Here we have 3 nested loops
+    First Nested While Loop:
+    
 """
 
 
-def simulated_annealing(number_of_coordinates: int, coordinates: [], vertical_lines: [], horizontal_lines: []):
-    # print("starting vertical_lines", vertical_lines)
-    # print("starting horizontal_lines", horizontal_lines)
+def simulated_annealing(number_of_coordinates: int, coordinates: []):
+    vertical_lines, horizontal_lines = arbitrary_feasible_solution(number_of_coordinates, coordinates)
+
     i = 0
     j = i + 1
     reset_count = 0
     while i < len(vertical_lines):
         while j < len(vertical_lines):
-            # print(i, j)
             two_line_removed_vertical_lines = []
-
             for k in range(0, len(vertical_lines)):
                 if k != i and k != j:
                     two_line_removed_vertical_lines.append(vertical_lines[k])
@@ -236,7 +147,6 @@ def simulated_annealing(number_of_coordinates: int, coordinates: [], vertical_li
     j = i + 1
     while i < len(horizontal_lines):
         while j < len(horizontal_lines):
-            # print(i, j)
             two_line_removed_horizontal_lines = []
 
             for k in range(0, len(horizontal_lines)):
@@ -270,7 +180,6 @@ def third_line_simulated_annealing(number_of_coordinates: int,
                                    vertical_lines: [],
                                    horizontal_lines: [],
                                    un_separated_coordinates: []):
-    # print("un_separated_coordinates", len(un_separated_coordinates))
     for un_separated_coordinate in un_separated_coordinates:
         first_coordinate = un_separated_coordinate[0]
         second_coordinate = un_separated_coordinate[1]
@@ -283,9 +192,9 @@ def third_line_simulated_annealing(number_of_coordinates: int,
         simulated_vertical_lines.append(third_vertical_line)
         simulated_vertical_lines.sort()
 
-        is_vertical_simulation_feasible = is_solution_feasible(number_of_coordinates, coordinates,
-                                                               simulated_vertical_lines,
-                                                               horizontal_lines)
+        is_vertical_simulation_feasible = check_feasibility(number_of_coordinates, coordinates,
+                                                            simulated_vertical_lines,
+                                                            horizontal_lines)
 
         if is_vertical_simulation_feasible is True:
             return True, simulated_vertical_lines, horizontal_lines
@@ -297,9 +206,9 @@ def third_line_simulated_annealing(number_of_coordinates: int,
         simulated_horizontal_lines.append(third_horizontal_line)
         simulated_horizontal_lines.sort()
 
-        is_horizontal_simulation_feasible = is_solution_feasible(number_of_coordinates, coordinates,
-                                                                 vertical_lines,
-                                                                 simulated_horizontal_lines)
+        is_horizontal_simulation_feasible = check_feasibility(number_of_coordinates, coordinates,
+                                                              vertical_lines,
+                                                              simulated_horizontal_lines)
 
         if is_horizontal_simulation_feasible is True:
             return True, vertical_lines, simulated_horizontal_lines

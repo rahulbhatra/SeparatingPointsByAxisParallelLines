@@ -9,9 +9,15 @@ import time
 import datetime
 import matplotlib.pyplot as plt
 from CheckFeasiblity import *
+import sys
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+
+    number_of_files = 1
+    if len(sys.argv) == 2:
+        number_of_files = int(sys.argv[1])
+
     inputs = read_inputs(1)
 
     i = 1
@@ -65,4 +71,3 @@ if __name__ == '__main__':
 
         plt.savefig(output_file_name[0:-4])
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
