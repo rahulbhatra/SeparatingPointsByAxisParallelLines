@@ -3,19 +3,84 @@
         - axis parallel lines are represented by vertical_lines and horizontal_lines
 
     Logic:-
-        First sorting coordinates on the basis of x axis then updating x_axis_separation_map
+        Using both x_axis_separation_map and y_axis_separation_map checking if there is any combination between
+    two coordinates which is yet not separated. If combination is present like that then solution is not feasible.
+
+    Total time complexity is as following:-
+        1. time complexity of the generate_separation_maps function is O(n ^ 2).
+        2. nested for loop have inner for loop and both run for n = number of coordinates. So time
+        complexity of the nested for loop will be O(n ^2 ).
+        3. un_separated_coordinates set to list conversion is O(n).
+
+    So total time complexity of the function is O(n ^ 2).
+"""
+
+
+def check_feasibility(number_of_coordinates: int, coordinates: [], vertical_lines: [], horizontal_lines: []):
+    x_axis_separation_map, y_axis_separation_map, replaced_index = generate_separation_maps \
+        (number_of_coordinates, coordinates, vertical_lines, horizontal_lines)
+
+    for i in range(0, number_of_coordinates):
+        for j in range(i + 1, number_of_coordinates):
+            i_replaced_index = replaced_index[i]
+            j_replaced_index = replaced_index[j]
+            if x_axis_separation_map[i][j] is False and \
+                    (y_axis_separation_map[i_replaced_index][j_replaced_index] is True or
+                     y_axis_separation_map[j_replaced_index][i_replaced_index] is True):
+                x_axis_separation_map[i][j] = True
+
+            if x_axis_separation_map[i][j] is False:
+                return False
+
+    return True
+
+
+"""
+    Method is used for getting not separated points by axis parallel lines.
+    Total time complexity is as following:-
+        1. time complexity of the generate_separation_maps function is O(n ^ 2).
+        2. nested for loop have inner for loop and both run for n = number of coordinates. So time
+        complexity of the nested for loop will be O(n ^2 ).
+        3. un_separated_coordinates set to list conversion is O(n).
+
+    So total time complexity of the function is O(n ^ 2).
+"""
+
+
+def get_un_separated_coordinates(number_of_coordinates: int, coordinates: [], vertical_lines: [], horizontal_lines: []):
+    x_axis_separation_map, y_axis_separation_map, replaced_index = generate_separation_maps \
+        (number_of_coordinates, coordinates, vertical_lines, horizontal_lines)
+    un_separated_coordinates = set()
+    for i in range(0, number_of_coordinates):
+        for j in range(i + 1, number_of_coordinates):
+            i_replaced_index = replaced_index[i]
+            j_replaced_index = replaced_index[j]
+            if x_axis_separation_map[i][j] is False and \
+                    (y_axis_separation_map[i_replaced_index][j_replaced_index] is True or
+                     y_axis_separation_map[j_replaced_index][i_replaced_index] is True):
+                x_axis_separation_map[i][j] = True
+
+            if x_axis_separation_map[i][j] is False:
+                un_separated_coordinates.add(coordinates[i])
+                un_separated_coordinates.add(coordinates[j])
+
+    return list(un_separated_coordinates)
+
+
+"""
+    Following function is used to prepare vertical lines separation map and horizontal line separation map.
+    Separation map is 2d array which denotes combination of two coordinate and if value is true then it is
+    separated by a line.
+    
+    Logic:-
+        First sort coordinates on the basis of x axis then updating x_axis_separation_map
         which update separation relation between two coordinates.
             - As points are sorted on x axis if first_x_axis coordinate and second_x_axis coordinate
             is separated using vertical line then we can say first_x_axis coordinate is separated
             to bigger_x_axis coordinates.
 
         With same logic as above now sorting coordinates on y_axis and producing y_axis_separation_map
-
-        Using both maps producing last map which inherit both maps value and produces full separation
-        update of coordinates
-
-        Now using last map we decide whether the solution is feasible or not.
-
+        
     Time Complexity Analysis:-
     n = number of coordinates
     1. x_axis_sorted_coordinates is sorted in O(n log n) time
@@ -40,20 +105,12 @@
     Time complexity will be equivalent to step 1, 2, 3
 
     5. find_replaced_index run for O(n ^ 2) time to find new index after sorting coordinates on y_axis
-
-    6. Using both maps producing last map which inherit both maps value and produces full separation
-        update of coordinates runs for O(n ^ 2) time
-
-    7. To decide whether solution is feasible or not we run on O(n ^ 2)
-
-    Total time complexity is as following:-
-        step 1, 2, 3 combined + step 4 + step 5 + step 6 + step 7
-        So time complexity of the algorithm will be O(n ^ 2).
-
+    
+    So total Time complexity of this function is O(n ^ 2).
 """
 
 
-def check_feasibility(number_of_coordinates: int, coordinates: [], vertical_lines: [], horizontal_lines: []):
+def generate_separation_maps(number_of_coordinates: int, coordinates: [], vertical_lines: [], horizontal_lines: []):
     x_axis_sorted_coordinates = sorted(coordinates)
 
     # assume all coordinates are separated at first
@@ -120,26 +177,7 @@ def check_feasibility(number_of_coordinates: int, coordinates: [], vertical_line
     #     print(i + 1, y_axis_separation_map[i])
 
     replaced_index = find_replaced_index(number_of_coordinates, x_axis_sorted_coordinates, y_axis_sorted_coordinates)
-
-    for i in range(0, number_of_coordinates):
-        for j in range(i + 1, number_of_coordinates):
-            i_replaced_index = replaced_index[i]
-            j_replaced_index = replaced_index[j]
-            if x_axis_separation_map[i][j] is False and \
-                    (y_axis_separation_map[i_replaced_index][j_replaced_index] is True or
-                     y_axis_separation_map[j_replaced_index][i_replaced_index] is True):
-                x_axis_separation_map[i][j] = True
-
-    # print('------ X Axis Separation Map ------------')
-    # for i in range(0, number_of_coordinates):
-    #     print(i + 1, x_axis_separation_map[i])
-
-    for i in range(0, number_of_coordinates):
-        for j in range(i + 1, number_of_coordinates):
-            if x_axis_separation_map[i][j] is False:
-                return False
-
-    return True
+    return x_axis_separation_map, y_axis_separation_map, replaced_index
 
 
 """
@@ -154,9 +192,6 @@ def find_replaced_index(number_of_coordinates: int, x_axis_sorted_coordinates: [
         for y_axis_sorted_coordinate_index in range(0, number_of_coordinates):
             if x_axis_sorted_coordinates[x_axis_sorted_coordinate_index] == \
                     y_axis_sorted_coordinates[y_axis_sorted_coordinate_index]:
-                # print(x_axis_sorted_coordinates[x_axis_sorted_coordinate_index])
-                # print(y_axis_sorted_coordinates[y_axis_sorted_coordinate_index])
-
                 replaced_index[x_axis_sorted_coordinate_index] = y_axis_sorted_coordinate_index
 
     return replaced_index
@@ -206,3 +241,28 @@ def check_is_feasible(number_of_coordinates: int, coordinates: [], vertical_line
 
     # Every pair found a separation between so it is a feasible solution
     return is_feasible
+
+
+"""
+    This algorithm is used to compare the result of both feasibility checking algorithms
+    for assurance of the output produced.
+    
+    First Algorithm check_feasibility is O(n^2) and second algorithm is O(n^3).   
+"""
+
+
+def compare_feasibility_algorithms(number_of_coordinates: int, coordinates: [], vertical_lines: [],
+                                   horizontal_lines: []):
+    is_feasible_first = check_feasibility(number_of_coordinates, coordinates, vertical_lines,
+                                          horizontal_lines)
+    is_feasible_second = check_is_feasible(number_of_coordinates, coordinates, vertical_lines,
+                                           horizontal_lines)
+    print('Check Feasibility Function Output:', is_feasible_first)
+    print('Check Is Feasible Function Output:', is_feasible_second)
+
+    if is_feasible_first == is_feasible_second:
+        print("Both Feasibility Checking Algorithm is producing similar output. Happy Coding :)")
+        return True
+    else:
+        print("Both Feasibility Checking Algorithm is Not producing similar output Please Check your code")
+        return False
