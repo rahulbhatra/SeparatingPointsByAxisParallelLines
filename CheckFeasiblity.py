@@ -205,6 +205,8 @@ def find_replaced_index(number_of_coordinates: int, x_axis_sorted_coordinates: [
     Here we have n = number of coordinates
     At most there can be n - 1 number of vertical lines or n - 1 horizontal lines to separate every
     point with each other.
+    
+    Sorting the coordinates will be done in time complexity of O(n).
 
     So Nested loop time complexity will be O(n^3) as most outer loop will run for n times, second outer
     loop will also run for n times and most inner loop also run for max n - 1 times.
@@ -215,6 +217,7 @@ def find_replaced_index(number_of_coordinates: int, x_axis_sorted_coordinates: [
 
 
 def check_is_feasible(number_of_coordinates: int, coordinates: [], vertical_lines: [], horizontal_lines: []):
+    coordinates = sorted(coordinates)
     is_feasible = True
     for i in range(0, number_of_coordinates - 1):
         for j in range(i + 1, number_of_coordinates):

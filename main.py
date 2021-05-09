@@ -12,7 +12,7 @@ import sys
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    number_of_files = 6
+    number_of_files = 5
     print(len(sys.argv))
     if len(sys.argv) == 2:
         number_of_files = int(sys.argv[1])

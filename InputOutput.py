@@ -96,12 +96,12 @@ def prepare_plot(coordinates: [], vertical_lines: [], horizontal_lines: [], outp
         x_axis.append(coordinate[0])
         y_axis.append(coordinate[1])
 
-    # print('x_axis', x_axis)
-    # print('y_axis', y_axis)
-    # print('vertical lines', vertical_lines)
-    # print('horizontal lines', horizontal_lines)
+    print('x_axis', x_axis)
+    print('y_axis', y_axis)
+    print('vertical lines', vertical_lines)
+    print('horizontal lines', horizontal_lines)
 
-    plt.figure(figsize=(max(x_axis) // 2, max(y_axis) // 2))
+    plt.figure(figsize=(abs(max(x_axis)) // 2 + 1, abs(max(y_axis)) // 2 + 1))
     plt.xlabel('x axis')
     plt.ylabel('y axis')
     plt.title('Separating Points by Axis Parallel Lines')
